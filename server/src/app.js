@@ -19,6 +19,10 @@ app.use(cors(
     }
 ))
 
+import imageKitRoutes from "./routes/imageKit.routes.js"
+
+app.use("/api/imageKit",imageKitRoutes)
+
 // app.get("/", (req, res) => {
 //     res.send("New B2B project is on the way!")
 // })
