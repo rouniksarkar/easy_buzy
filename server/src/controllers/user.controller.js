@@ -50,4 +50,15 @@ async function loginUser(req,res){
     return res.status(200).json({message:"User login successfully"});
 } 
 
-export {registerUser,loginUser}
+async function logoutUser(req,res){
+
+    try {
+        res.clearCookie("token");
+        return res.status(200).json({message:"User logout successfully"});
+    } catch (error) {
+        return res.status(500).json({message:"Internal server error"});
+    }
+
+}
+
+export {registerUser,loginUser,logoutUser}

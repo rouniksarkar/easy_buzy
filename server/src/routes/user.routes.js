@@ -1,5 +1,6 @@
 import express from "express"
-import { loginUser, registerUser } from "../controllers/user.controller.js"
+import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js"
+import authMiddleware from "../middleware/auth.middleware.js"
 
 const route = express.Router()
 
@@ -7,8 +8,6 @@ route.post("/register-user",registerUser)
 
 route.post("/login-user",loginUser)
 
-// route.get("/get-user",getUser)
-
-// route.get("/get-one-user/:id",getOneUser)
+route.post ("/logout-user",authMiddleware,logoutUser)
 
 export default route;
