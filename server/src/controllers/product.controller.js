@@ -56,7 +56,19 @@ async function createProductController(req, res) {
 async function getProductsController(req, res) {
 
     try {
-        const products = await Product.find();
+
+        const {supplier} = req.quary;
+
+        let filter = {};
+
+        if(req.user.role==="supplier"){
+            filter.supplier=req.user.id
+        }
+        else if(supplier){
+            filter.supplier=supplier
+        }
+
+        const products = await Product.find(filter);
 
         if (products.length === 0) {
             return res.status(404).json({ message: "Products not found!" });
