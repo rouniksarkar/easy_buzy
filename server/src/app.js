@@ -36,4 +36,10 @@ import authRoutes from "./routes/user.routes.js"
 
 app.use("/api/auth",authRoutes)
 
+//product routes
+
+import productRoutes from "./routes/product.routes.js"
+
+app.use("/api/product",productRoutes)
+
 export { app }

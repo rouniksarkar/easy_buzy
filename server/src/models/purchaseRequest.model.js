@@ -10,15 +10,26 @@ const purchaseRequest = new mongoose.Schema({
     supplier:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
+        required:true
     },
-    items: [
-        {
-            product: ObjectId,
-            quantity: Number,
-            price: Number
-        }
-    ],
-    totalAmount: Number,
+    productId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Product",
+        required:true
+    },
+    product:{
+        type:String,
+        required:[true,"Name of the product"],
+    },
+    Quantity:{
+        type:Number,
+        required:[true,"Quantity of the product"],
+    },
+
+    totalAmount: {
+        type:Number,
+        required:[true,"Quantity of the product"],
+    },
 
     status: {
         type: String,
