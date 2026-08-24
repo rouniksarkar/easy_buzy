@@ -1,50 +1,62 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const purchaseRequest = new mongoose.Schema({
+const purchaseRequestSchema = new mongoose.Schema(
+    {
+        wholesaler: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
 
-    wholeSeller:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    },
-    supplier:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    },
-    productId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Product",
-        required:true
-    },
-    product:{
-        type:String,
-        required:[true,"Name of the product"],
-    },
-    Quantity:{
-        type:Number,
-        required:[true,"Quantity of the product"],
-    },
+        supplier: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
 
-    totalAmount: {
-        type:Number,
-        required:[true,"Quantity of the product"],
-    },
+        product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
+        },
 
-    status: {
-        type: String,
-        enum: [
-            "pending",
-            "accepted",
-            "rejected",
-            "cancelled"
-        ],
-        default: "pending"
+        quantity: {
+            type: Number,
+            required: [true, "Quantity is required"],
+            min: [1, "Quantity must be at least 1"]
+        },
+
+        price: {
+            type: Number,
+            required: [true, "Product price is required"],
+            min: [0, "Price cannot be negative"]
+        },
+
+        totalAmount: {
+            type: Number,
+            required: [true, "Total amount is required"],
+            min: [0, "Total amount cannot be negative"]
+        },
+
+        status: {
+            type: String,
+            enum: [
+                "pending",
+                "accepted",
+                "rejected",
+                "cancelled"
+            ],
+            default: "pending"
+        }
+    },
+    {
+        timestamps: true
     }
-},{
-    timestamps:true
-})
+);
 
-const PurchaseRequest = mongoose.model("PurchaseRequest",purchaseRequest);
+const PurchaseRequest = mongoose.model(
+    "PurchaseRequest",
+    purchaseRequestSchema
+);
 
 export default PurchaseRequest;
