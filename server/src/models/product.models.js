@@ -29,7 +29,8 @@ const productSchema = new mongoose.Schema({
     },
     image:{
         type:String,
-        requird:true
+        requird:true,
+        default:""
     },
     MOQ:{
         type:Number,
@@ -37,7 +38,8 @@ const productSchema = new mongoose.Schema({
     },
     unit:{
         type:String,
-        required:true
+        required:true,
+        default:""
     },
     status:{
         type:String,

@@ -4,10 +4,10 @@ import authMiddleware from "../middleware/auth.middleware.js"
 
 const route = express.Router()
 
-route.post("/register-user",registerUser)
+route.post("/register",registerUser)
 
-route.post("/login-user",loginUser)
+route.post("/login",loginUser)
 
-route.post ("/logout-user",authMiddleware,logoutUser)
+route.post ("/logout",authMiddleware,logoutUser)
 
 export default route;

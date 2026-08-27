@@ -1,11 +1,11 @@
 import express from "express"
-import authMiddleware from "../middleware/auth.middleware"
-import authorize from "../middleware/authorize.middleware"
-import { createProductController, deleteProductController, getOneProductController, getProductsController, updateProductController } from "../controllers/product.controller"
+import authMiddleware from "../middleware/auth.middleware.js"
+import authorize from "../middleware/authorize.middleware.js"
+import { createProductController, deleteProductController, getOneProductController, getProductsController, updateProductController } from "../controllers/product.controller.js"
 
 const route = express.Router()
 
-route.post("/creat-product",authMiddleware,authorize("supplier","admin"),createProductController)
+route.post("/create-product",authMiddleware,authorize("supplier","admin"),createProductController)
 
 route.get("/get-products",authMiddleware,getProductsController)
 

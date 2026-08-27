@@ -1,4 +1,4 @@
-import Product from "../models/product.models";
+import Product from "../models/product.models.js";
 
 async function createProductController(req, res) {
 
@@ -11,7 +11,6 @@ async function createProductController(req, res) {
             "price",
             "quantity",
             "category",
-            "image",
             "MOQ",
             "unit",
             "status",
@@ -28,13 +27,13 @@ async function createProductController(req, res) {
         }
 
         const product = await Product.create({
-            supplier: req.user.id,
+            supplierId: req.user.id,
             name: body.name,
             description: body.description,
             price: body.price,
             quantity: body.quantity,
             category: body.category,
-            image: body.image,
+            image: body.image || "",
             MOQ: body.MOQ,
             status: body.status,
             unit: body.unit,
@@ -57,15 +56,15 @@ async function getProductsController(req, res) {
 
     try {
 
-        const {supplier} = req.quary;
+        const {supplierId} = req.query;
 
         let filter = {};
 
         if(req.user.role==="supplier"){
-            filter.supplier=req.user.id
+            filter.supplierId=req.user.id
         }
-        else if(supplier){
-            filter.supplier=supplier
+        else if(supplierId){
+            filter.supplierId=supplierId
         }
 
         const products = await Product.find(filter);
@@ -112,7 +111,7 @@ async function updateProductController(req, res) {
             price: body.price,
             quantity: body.quantity,
             category: body.category,
-            image: body.image,
+            image: body.image || "",
             MOQ: body.MOQ,
             unit: body.unit,
             status: body.status
@@ -123,18 +122,18 @@ async function updateProductController(req, res) {
                 id,
                 updateProduct,
                 {
-                    new: true,
+                    returnDocument: 'after',
                     runValidators: true
                 }
             )
         } else {
             product = await Product.findOneAndUpdate({
                 _id: id,
-                supplier: req.user.id
+                supplierId: req.user.id
             },
             updateProduct,
             {
-                new: true,
+                returnDocument: 'after',
                 runValidators: true
             }
             );
