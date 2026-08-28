@@ -57,6 +57,11 @@ const purchaseRequestSchema = new mongoose.Schema(
                 "cancelled"
             ],
             default: "pending"
+        },
+        paymentStatus:{
+            type:String,
+            enum:["paid","pending","failed"],
+            default:"pending"
         }
     },
     {

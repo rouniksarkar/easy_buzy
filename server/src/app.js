@@ -40,4 +40,10 @@ import purchaseRequestRoutes from "./routes/purchaseRequest.route.js"
 
 app.use("/api/purchaseRequest",purchaseRequestRoutes)
 
+// orders routes
+
+import orderRoutes from "./routes/order.routes.js";
+
+app.use("/api/orders",orderRoutes)
+
 export { app }

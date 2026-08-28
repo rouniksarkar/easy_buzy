@@ -1,3 +1,4 @@
+import Order from "../models/order.models.js";
 import Product from "../models/product.models.js";
 import PurchaseRequest from "../models/purchaseRequest.model.js";
 
@@ -191,6 +192,41 @@ async function deletePurchaseRequest(req, res) {
     }
 }
 
+async function payPurchaseRequest(req, res) {
+
+    try {
+        const {id} = req.params;
+
+        const purchaseRequest = await PurchaseRequest.findById(id);
+
+        if(!purchaseRequest){
+            return res.status(400).json({message:"No purchase request found."});
+        }
+
+        if(purchaseRequest.status !== "accepted"){
+            return res.status(200).json({message:"Request not accepted!"});
+        }
+
+        if(purchaseRequest.paymentStatus !== "paid"){
+            return res.status(200).json({message:"Payment not done!"});
+        }
+
+        const order = await Order.create({
+            purchaseRequest:purchaseRequest.id,
+            wholeSeller:purchaseRequest.wholeseller,
+            supplier:purchaseRequest.supplier,
+            productId:purchaseRequest.items.product,
+            quantity:purchaseRequest.items.quantity,
+            totalAmount:purchaseRequest.totalAmount
+        })
+
+        return res.status(201).json({sucess:true,message:"Order created from purchesed request!",order})
+
+    } catch (error) {
+        return res.status(500).json({message:"Failed to create order from purchesed request",error:error.message})
+    }
+}
+
 export {
     createPurchaseRequest,
     getAllPurchaseRequests,
@@ -198,5 +234,6 @@ export {
     acceptPurchaseRequest,
     rejectPurchaseRequest,
     cancelPurchaseRequest,
-    deletePurchaseRequest
+    deletePurchaseRequest,
+    payPurchaseRequest
 }
