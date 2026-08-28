@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const purchaseRequestSchema = new mongoose.Schema(
     {
-        wholesaler: {
+        wholeseller: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
@@ -14,23 +14,33 @@ const purchaseRequestSchema = new mongoose.Schema(
             required: true
         },
 
-        product: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Product",
-            required: true
-        },
+        items: [
+            {
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Product",
+                    required: true
+                },
 
-        quantity: {
-            type: Number,
-            required: [true, "Quantity is required"],
-            min: [1, "Quantity must be at least 1"]
-        },
+                quantity: {
+                    type: Number,
+                    required: true,
+                    min: 1
+                },
 
-        price: {
-            type: Number,
-            required: [true, "Product price is required"],
-            min: [0, "Price cannot be negative"]
-        },
+                price: {
+                    type: Number,
+                    required: true,
+                    min: 0
+                },
+
+                total: {
+                    type: Number,
+                    required: true,
+                    min: 0
+                }
+            }
+        ],
 
         totalAmount: {
             type: Number,
@@ -53,6 +63,15 @@ const purchaseRequestSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+
+purchaseRequestSchema.pre("validate", function() {
+    if(this.items && this.items.length > 0){
+        this.totalAmount = this.items.reduce((sum,item)=>sum+(item.price * item.quantity) , 0)
+    }
+    else{
+        this.totalAmount = 0;
+    }
+})
 
 const PurchaseRequest = mongoose.model(
     "PurchaseRequest",

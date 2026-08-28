@@ -23,14 +23,6 @@ import imageKitRoutes from "./routes/imageKit.routes.js"
 
 app.use("/api/imageKit",imageKitRoutes)
 
-// app.get("/", (req, res) => {
-//     res.send("New B2B project is on the way!")
-// })
-
-// app.get("/test", (req, res) => {
-//     res.json({ message: "testing on connectivity on docker." })
-// })
-
 //authentication routes
 import authRoutes from "./routes/user.routes.js"
 
@@ -41,5 +33,11 @@ app.use("/api/auth",authRoutes)
 import productRoutes from "./routes/product.routes.js"
 
 app.use("/api/product",productRoutes)
+
+// purchase order request routes
+
+import purchaseRequestRoutes from "./routes/purchaseRequest.route.js"
+
+app.use("/api/purchaseRequest",purchaseRequestRoutes)
 
 export { app }
