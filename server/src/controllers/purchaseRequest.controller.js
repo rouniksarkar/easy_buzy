@@ -5,14 +5,14 @@ async function createPurchaseRequest(req, res) {
 
     const { supplier, items } = req.body;
 
-    if (!supplier || !items || items.length===0) {
+    if (!supplier || !items || items.length === 0) {
         return res.status(400).json({ message: "Supplier and at least one item are required" })
     }
 
     try {
-        
+
         const processedItems = await Promise.all(
-            items.map(async (item) =>{
+            items.map(async (item) => {
                 const productData = await Product.findById(item.product);
 
                 if (!productData) {
@@ -20,7 +20,7 @@ async function createPurchaseRequest(req, res) {
                 }
 
                 return {
-                    product : item.product,
+                    product: item.product,
                     quantity: item.quantity,
                     price: productData.price,
                     total: productData.price * item.quantity,
@@ -32,12 +32,12 @@ async function createPurchaseRequest(req, res) {
         const purchaseRequest = await PurchaseRequest.create({
             wholeseller: req.user.id,
             supplier,
-            items:processedItems,
+            items: processedItems,
         })
 
         return res.status(200).json({ message: "purchase request created!", purchaseRequest })
     } catch (error) {
-        return res.status(500).json({ message: "purchase request creation failed!", error:error.message })
+        return res.status(500).json({ message: "purchase request creation failed!", error: error.message })
     }
 }
 
@@ -85,4 +85,118 @@ async function getPurchaseRequestById(req, res) {
     }
 }
 
-export { createPurchaseRequest, getAllPurchaseRequests, getPurchaseRequestById }
+async function acceptPurchaseRequest(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const purchaseRequest = await PurchaseRequest.findById(id);
+
+        if (!purchaseRequest) {
+            return res.status(404).json({ message: "Purchase request not found!" })
+        }
+
+        if (req.user.role === "supplier" && purchaseRequest.supplier.toString() !== req.user.id) {
+            return res.status(403).json({ message: "You are not authorize to accept request!" })
+        }
+
+        if (purchaseRequest.status !== "pending") {
+            return res.status(400).json({ message: `Request allready ${purchaseRequest.status}!` })
+        }
+
+        purchaseRequest.status = "accepted";
+
+        await purchaseRequest.save();
+
+        return res.status(201).json({ message: "Purchase request accepted!", purchaseRequest })
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to accept purchase request", error: error.message })
+    }
+
+}
+
+async function rejectPurchaseRequest(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const purchaseRequest = await PurchaseRequest.findById(id);
+
+        if (!purchaseRequest) {
+            return res.status(404).json({ message: "Purchase request not found!" })
+        }
+
+        if (req.user.role === "supplier" && purchaseRequest.supplier.toString() !== req.user.id) {
+            return res.status(403).json({ message: "You are not authorize to accept request!" })
+        }
+
+        if (purchaseRequest.status !== "pending") {
+            return res.status(400).json({ message: `Request allready ${purchaseRequest.status}!` })
+        }
+
+        purchaseRequest.status = "rejected";
+
+        await purchaseRequest.save();
+
+        return res.status(201).json({ message: "Purchase request rejected!", purchaseRequest })
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to reject purchase request", error: error.message })
+    }
+
+}
+
+async function cancelPurchaseRequest(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const purchaseRequest = await PurchaseRequest.findById(id);
+
+        if (!purchaseRequest) {
+            return res.status(404).json({ message: "Purchase request not found!" })
+        }
+
+        if (req.user.role === "wholeSeller" && purchaseRequest.wholeseller.toString() !== req.user.id) {
+            return res.status(403).json({ message: "You are not authorize to accept request!" })
+        }
+
+        if (purchaseRequest.status !== "pending") {
+            return res.status(400).json({ message: `Request allready ${purchaseRequest.status}!` })
+        }
+
+        purchaseRequest.status = "cancelled";
+
+        await purchaseRequest.save();
+
+        return res.status(200).json({ message: "Purchase request canceled!", purchaseRequest })
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to cancel purchase request", error: error.message })
+    }
+}
+
+async function deletePurchaseRequest(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const purchaseRequest = await PurchaseRequest.findByIdAndDelete(id);
+
+        if (!purchaseRequest) {
+            return res.status(400).json({ message: "Purchase request not found!" });
+        }
+
+        return res.status(200).json({ message: "Purchase request deleted!", purchaseRequest });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to delete Purchase request!", error:error.message });
+    }
+}
+
+export {
+    createPurchaseRequest,
+    getAllPurchaseRequests,
+    getPurchaseRequestById,
+    acceptPurchaseRequest,
+    rejectPurchaseRequest,
+    cancelPurchaseRequest,
+    deletePurchaseRequest
+}
