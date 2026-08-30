@@ -1,4 +1,4 @@
-import Order from "../models/order.models";
+import Order from "../models/order.models.js";
 
 async function getOrdersController(req, res) {
 
@@ -63,9 +63,28 @@ async function cancelOrderController(req, res) {
 
         return res.status(200).json({ success: true, message: "Order has been cancelled", order })
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Failed to Order cancell", error:error.message })
+        return res.status(500).json({ success: false, message: "Failed to Order cancell", error: error.message })
     }
 
 }
 
-export { getOrdersController, getOneOrderController, cancelOrderController }
+async function statusOrderController(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const {status} = req.body;
+
+        const order = await Order.findByIdAndUpdate(id, { status: status }, { returnDocument: 'after' })
+
+        if (!order) {
+            return res.status(404).json({ message: "No order found!" })
+        }
+
+        return res.status(200).json({ message: `Status updated to ${order.status}` ,order})
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to update status", error:error.message})
+    }
+}
+
+export { getOrdersController, getOneOrderController, cancelOrderController , statusOrderController}

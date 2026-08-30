@@ -207,16 +207,24 @@ async function payPurchaseRequest(req, res) {
             return res.status(200).json({message:"Request not accepted!"});
         }
 
-        if(purchaseRequest.paymentStatus !== "paid"){
-            return res.status(200).json({message:"Payment not done!"});
+        purchaseRequest.paymentStatus = "paid";
+
+        const existingOrder = await Order.findOne({
+            purchaseRequest: purchaseRequest._id
+        })
+
+        if (existingOrder) {
+            return res.status(409).json({
+                message: "Order already exists for this purchase request.",
+                order: existingOrder
+            });
         }
 
         const order = await Order.create({
             purchaseRequest:purchaseRequest.id,
             wholeSeller:purchaseRequest.wholeseller,
             supplier:purchaseRequest.supplier,
-            productId:purchaseRequest.items.product,
-            quantity:purchaseRequest.items.quantity,
+            items:purchaseRequest.items,
             totalAmount:purchaseRequest.totalAmount
         })
 

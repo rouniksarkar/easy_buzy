@@ -16,7 +16,7 @@ router.put("/purchase-requests/:id/reject", authMiddleware, authorize("admin","s
 
 router.put("/purchase-requests/:id/cancel", authMiddleware, authorize("admin","wholeSeller"), cancelPurchaseRequest);
 
-router.put("/purchase-requests/:id/pay", authMiddleware, authorize("wholeSeller"), payPurchaseRequest);
+router.post("/purchase-requests/:id/pay", authMiddleware, authorize("wholeSeller"), payPurchaseRequest);
 
 router.delete("/purchase-requests/:id", authMiddleware, authorize("admin","supplier","wholeSeller"), deletePurchaseRequest); 
 
