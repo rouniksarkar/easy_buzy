@@ -5,11 +5,11 @@ import { cancelOrderController, getOneOrderController, getOrdersController, stat
 
 const router = express.Router();
 
-router.get("/",authMiddleware,authorize("admin","supplier","wholeSeller"),getOrdersController);
+router.get("/",authMiddleware,authorize("admin","supplier","wholesaler"),getOrdersController);
 
-router.get("/:id",authMiddleware,authorize("admin","supplier","wholeSeller"),getOneOrderController);
+router.get("/:id",authMiddleware,authorize("admin","supplier","wholesaler"),getOneOrderController);
 
-router.patch("/:id/cancel",authMiddleware,authorize("admin","wholeSeller"),cancelOrderController);
+router.patch("/:id/cancel",authMiddleware,authorize("admin","wholesaler"),cancelOrderController);
 
 router.patch("/:id",authMiddleware,authorize("admin","supplier"),statusOrderController);
 

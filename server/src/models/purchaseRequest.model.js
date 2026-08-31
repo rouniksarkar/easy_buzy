@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const purchaseRequestSchema = new mongoose.Schema(
     {
-        wholeseller: {
+        wholesaler: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true

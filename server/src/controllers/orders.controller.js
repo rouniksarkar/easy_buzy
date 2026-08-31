@@ -45,11 +45,11 @@ async function cancelOrderController(req, res) {
             return res.status(404).json({ message: "No order found!" })
         }
 
-        if (req.user.role !== "wholeSeller") {
+        if (req.user.role !== "wholesaler") {
             return res.status(500).json({ message: "You are not permited to cancel the order!" })
         }
 
-        if (req.user.id !== order.wholeSeller) {
+        if (req.user.id !== order.wholesaler) {
             return res.status(500).json({ message: "You are not permited to cancel the order!" })
         }
 

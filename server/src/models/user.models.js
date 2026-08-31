@@ -22,12 +22,30 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum:["supplier","wholeSeller","admin"],
+        enum:["supplier","wholesaler","admin"],
         required:true
     },
     avatar: {
         type: String,
         default: ""
+    },
+    organisation:{
+        type:String,
+        default:""
+    },
+    phone:{
+        type:Number,
+        min:10,
+        max:10,
+        default:""
+    },
+    fullName:{
+        type:String,
+        default:""
+    },
+    address:{
+        type:String,
+        default:""
     }
 },{
     timestamps: true  

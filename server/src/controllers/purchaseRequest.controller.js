@@ -31,7 +31,7 @@ async function createPurchaseRequest(req, res) {
 
 
         const purchaseRequest = await PurchaseRequest.create({
-            wholeseller: req.user.id,
+            wholesaler: req.user.id,
             supplier,
             items: processedItems,
         })
@@ -46,15 +46,15 @@ async function createPurchaseRequest(req, res) {
 async function getAllPurchaseRequests(req, res) {
 
     try {
-        const { wholeseller } = req.query;
+        const { wholesaler } = req.query;
 
         let filter = {};
 
-        if (req.user.role === "wholeSeller") {
-            filter.wholeseller = req.user.id
+        if (req.user.role === "wholesaler") {
+            filter.wholesaler = req.user.id
         }
-        else if (wholeseller) {
-            filter.wholeseller = wholeseller
+        else if (wholesaler) {
+            filter.wholesaler = wholesaler
         }
 
         const purchaseRequests = await PurchaseRequest.find(filter);
@@ -157,7 +157,7 @@ async function cancelPurchaseRequest(req, res) {
             return res.status(404).json({ message: "Purchase request not found!" })
         }
 
-        if (req.user.role === "wholeSeller" && purchaseRequest.wholeseller.toString() !== req.user.id) {
+        if (req.user.role === "wholesaler" && purchaseRequest.wholesaler.toString() !== req.user.id) {
             return res.status(403).json({ message: "You are not authorize to accept request!" })
         }
 
@@ -222,7 +222,7 @@ async function payPurchaseRequest(req, res) {
 
         const order = await Order.create({
             purchaseRequest:purchaseRequest.id,
-            wholeSeller:purchaseRequest.wholeseller,
+            wholesaler:purchaseRequest.wholesaler,
             supplier:purchaseRequest.supplier,
             items:purchaseRequest.items,
             totalAmount:purchaseRequest.totalAmount

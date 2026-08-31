@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema(
             unique: true
         },
 
-        wholeSeller: {
+        wholesaler: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
