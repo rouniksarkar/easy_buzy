@@ -50,7 +50,7 @@ async function loginUser(req, res) {
 
         return res.status(200).json({ message: "User login successfully" });
     } catch (error) {
-        return res.status(500).json({message:"some thing went wrong on login",error})
+        return res.status(500).json({ message: "some thing went wrong on login", error })
     }
 }
 
@@ -65,4 +65,34 @@ async function logoutUser(req, res) {
 
 }
 
-export { registerUser, loginUser, logoutUser }
+async function updateProfileController(req, res) {
+
+    try {
+        const { avatar, organisation, fullName, phone, address } = req.body;
+
+        const { id } = req.params;
+
+        if (id !== req.user.id) {
+            return res.status(400).json({ message: "You are not authorized!" })
+        }
+
+        const user = await User.findByIdAndUpdate(id, {
+            avatar,
+            organisation,
+            phone,
+            address,
+            fullName
+        }, {
+            returnDocument: 'after',
+            runValidators: true
+        })
+
+        return res.status(200).json({ message: "Profile upated!", user })
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to upated profile", error: error.message })
+    }
+}
+
+
+
+export { registerUser, loginUser, logoutUser ,updateProfileController}

@@ -10,4 +10,8 @@ route.post("/login",loginUser)
 
 route.post ("/logout",authMiddleware,logoutUser)
 
+route.put("/profile/:id",authMiddleware,updateProfileController)
+
+route.get("/profile/:id",authMiddleware,getProfileController)
+
 export default route;
