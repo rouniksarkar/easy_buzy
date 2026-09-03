@@ -114,7 +114,7 @@ async function getAllProfile(req, res) {
 
         return res.status(200).json({ message: "All profile fetched!", profiles })
     } catch (error) {
-        return res.status(500).json({ message: "Failed to fetching profiles", error:error.message })
+        return res.status(500).json({ message: "Failed to fetching profiles", error: error.message })
     }
 }
 
@@ -126,37 +126,81 @@ async function getProfileById(req, res) {
 
     const targetProfile = await User.findById(targetUserId);
 
-    if(!targetProfile){
-        return res.status(404).json({message:"No user found!"})
+    if (!targetProfile) {
+        return res.status(404).json({ message: "No user found!" })
     }
 
-    if(targetProfile.id === logedInUser.id){
+    if (targetProfile.id === logedInUser.id) {
         return res.status(200).json(targetProfile);
     }
 
-    if(logedInUser.role==="admin"){
+    if (logedInUser.role === "admin") {
         return res.status(200).json(targetProfile);
     }
 
     if (targetProfile.role === 'admin') {
-      return res.status(403).json({ message: "Access denied. Admin profiles are private." });
+        return res.status(403).json({ message: "Access denied. Admin profiles are private." });
     }
 
-    if(logedInUser.role === targetProfile.role){
-        return res.status(404).json({message:"you restricted from this action!"});
+    if (logedInUser.role === targetProfile.role) {
+        return res.status(404).json({ message: "you restricted from this action!" });
     }
 
     const safeProfile = {
         name: targetProfile.fullName,
-        organisation : targetProfile.organisation,
+        organisation: targetProfile.organisation,
         email: targetProfile.email,
         phone: targetProfile.phone,
         address: targetProfile.address,
-        Role:targetProfile.role
+        Role: targetProfile.role
     }
 
-     return res.status(200).json(safeProfile);
+    return res.status(200).json(safeProfile);
 
 }
 
-export { registerUser, loginUser, logoutUser, updateProfileController, getAllProfile, getProfileById }
+async function suspendProfile(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByIdAndUpdate({ id, profileStatus: { $ne: "suspended" } }, { $set: { profileStatus: "suspended" } }, {
+            returnDocument: 'after',
+            runValidators: true
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" })
+        }
+
+        return res.status(200).json({ message: "Profile suspended!", user })
+    } catch (error) {
+        return res.status(200).json({ message: "Failed to profile suspend!", error: error.message })
+    }
+
+}
+
+async function activateProfile(req, res) {
+
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByIdAndUpdate({ id, profileStatus: "suspended" }, { $set: { profileStatus: "activate" } },
+            {
+                returnDocument: 'after',
+                runValidators: true
+            }
+        )
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found!" })
+        }
+
+        return res.status(200).json({ message: "Profile Activated!", user })
+    } catch (error) {
+        return res.status(200).json({ message: "Failed to profile activate!", error: error.message })
+    }
+
+}
+
+export { registerUser, loginUser, logoutUser, updateProfileController, getAllProfile, getProfileById, suspendProfile, activateProfile }

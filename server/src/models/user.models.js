@@ -46,6 +46,11 @@ const userSchema = new mongoose.Schema({
     address:{
         type:String,
         default:""
+    },
+    profileStatus:{
+        type:String,
+        enum:["activate","inavtiavte","suspended"],
+        default:"activate"
     }
 },{
     timestamps: true  
