@@ -1,5 +1,5 @@
 import express from "express"
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js"
+import { getAllProfile, getProfileById, loginUser, logoutUser, registerUser, updateProfileController } from "../controllers/user.controller.js"
 import authMiddleware from "../middleware/auth.middleware.js"
 
 const route = express.Router()
@@ -12,6 +12,8 @@ route.post ("/logout",authMiddleware,logoutUser)
 
 route.put("/profile/:id",authMiddleware,updateProfileController)
 
-route.get("/profile/:id",authMiddleware,getProfileController)
+route.get("/profile",authMiddleware,getAllProfile)
+
+route.get("/profile/:id",authMiddleware,getProfileById)
 
 export default route;

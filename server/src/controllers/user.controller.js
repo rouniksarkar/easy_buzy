@@ -93,6 +93,70 @@ async function updateProfileController(req, res) {
     }
 }
 
+async function getAllProfile(req, res) {
 
+    try {
+        const logedInUser = req.user;
 
-export { registerUser, loginUser, logoutUser ,updateProfileController}
+        const query = {};
+
+        if (logedInUser.role === "wholesaler") {
+            query = { role: "supplier" }
+        }
+        else if (logedInUser.role === "supplier") {
+            query = { role: "wholesaler" }
+        }
+        else if (logedInUser.role === "admin") {
+            query = {}
+        }
+
+        const profiles = await User.find(query).select(" -password")
+
+        return res.status(200).json({ message: "All profile fetched!", profiles })
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to fetching profiles", error:error.message })
+    }
+}
+
+async function getProfileById(req, res) {
+
+    const logedInUser = req.user;
+
+    const targetUserId = req.params.id;
+
+    const targetProfile = await User.findById(targetUserId);
+
+    if(!targetProfile){
+        return res.status(404).json({message:"No user found!"})
+    }
+
+    if(targetProfile.id === logedInUser.id){
+        return res.status(200).json(targetProfile);
+    }
+
+    if(logedInUser.role==="admin"){
+        return res.status(200).json(targetProfile);
+    }
+
+    if (targetProfile.role === 'admin') {
+      return res.status(403).json({ message: "Access denied. Admin profiles are private." });
+    }
+
+    if(logedInUser.role === targetProfile.role){
+        return res.status(404).json({message:"you restricted from this action!"});
+    }
+
+    const safeProfile = {
+        name: targetProfile.fullName,
+        organisation : targetProfile.organisation,
+        email: targetProfile.email,
+        phone: targetProfile.phone,
+        address: targetProfile.address,
+        Role:targetProfile.role
+    }
+
+     return res.status(200).json(safeProfile);
+
+}
+
+export { registerUser, loginUser, logoutUser, updateProfileController, getAllProfile, getProfileById }
