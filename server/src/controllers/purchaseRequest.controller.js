@@ -20,6 +20,12 @@ async function createPurchaseRequest(req, res) {
                     throw new Error(`Product not found: ${item.product}`);
                 }
 
+                if (productData.quantity < item.quantity) {
+                    throw new Error(
+                        `Insufficient stock for "${productData.name}". Available: ${productData.stock}, Requested: ${item.quantity}`
+                    );
+                }
+
                 return {
                     product: item.product,
                     quantity: item.quantity,
@@ -188,26 +194,28 @@ async function deletePurchaseRequest(req, res) {
 
         return res.status(200).json({ message: "Purchase request deleted!", purchaseRequest });
     } catch (error) {
-        return res.status(500).json({ message: "Failed to delete Purchase request!", error:error.message });
+        return res.status(500).json({ message: "Failed to delete Purchase request!", error: error.message });
     }
 }
 
 async function payPurchaseRequest(req, res) {
 
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
         const purchaseRequest = await PurchaseRequest.findById(id);
 
-        if(!purchaseRequest){
-            return res.status(400).json({message:"No purchase request found."});
+        if (!purchaseRequest) {
+            return res.status(400).json({ message: "No purchase request found." });
         }
 
-        if(purchaseRequest.status !== "accepted"){
-            return res.status(200).json({message:"Request not accepted!"});
+        if (purchaseRequest.status !== "accepted") {
+            return res.status(200).json({ message: "Request not accepted!" });
         }
 
         purchaseRequest.paymentStatus = "paid";
+
+        await purchaseRequest.save();
 
         const existingOrder = await Order.findOne({
             purchaseRequest: purchaseRequest._id
@@ -220,18 +228,33 @@ async function payPurchaseRequest(req, res) {
             });
         }
 
+        for (const item of purchaseRequest.items) {
+            const updatedProductQuantity = await Product.findOneAndUpdate({
+                _id: item.product,
+                quantity: { $gt: item.quantity }
+            }, {
+                $inc: { quantity: -item.quantity }
+            }, {
+                returnDocument: 'after'
+            });
+
+            if (!updatedProductQuantity) {
+                throw new Error(`Insufficient quantity or product not found for ID: ${item.product}`);
+            }
+        }
+
         const order = await Order.create({
-            purchaseRequest:purchaseRequest.id,
-            wholesaler:purchaseRequest.wholesaler,
-            supplier:purchaseRequest.supplier,
-            items:purchaseRequest.items,
-            totalAmount:purchaseRequest.totalAmount
+            purchaseRequest: purchaseRequest.id,
+            wholesaler: purchaseRequest.wholesaler,
+            supplier: purchaseRequest.supplier,
+            items: purchaseRequest.items,
+            totalAmount: purchaseRequest.totalAmount
         })
 
-        return res.status(201).json({sucess:true,message:"Order created from purchesed request!",order})
+        return res.status(201).json({ sucess: true, message: "Order created from purchesed request!", order })
 
     } catch (error) {
-        return res.status(500).json({message:"Failed to create order from purchesed request",error:error.message})
+        return res.status(500).json({ message: "Failed to create order from purchesed request", error: error.message })
     }
 }
 
