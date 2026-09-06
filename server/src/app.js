@@ -46,4 +46,10 @@ import orderRoutes from "./routes/order.routes.js";
 
 app.use("/api/orders",orderRoutes)
 
+// notification 
+
+import notificationRoutes from "./routes/notification.routes.js"
+
+app.use("/api",notificationRoutes)
+
 export { app }
